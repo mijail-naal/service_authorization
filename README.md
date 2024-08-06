@@ -3,7 +3,7 @@
 
 
 ### Развертывание
-
+*Auth_sprint_2/docker-compose.yml*
 
 ```bash
   docker compose up --build -d
