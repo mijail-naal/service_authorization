@@ -141,7 +141,7 @@ GitHub.sublime-settings
 *.DS_Store
 
 # ES's generated data
-services/es/data
+es/data
 
 # Redis's generated data
-services/redis/data
+redis/data
