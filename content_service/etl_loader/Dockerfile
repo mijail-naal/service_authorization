@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.11
 
 WORKDIR /opt/etl_loader
 COPY requirements.txt requirements.txt
