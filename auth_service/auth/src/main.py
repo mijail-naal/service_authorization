@@ -11,7 +11,7 @@ from redis.asyncio import Redis
 from async_fastapi_jwt_auth import AuthJWT
 from async_fastapi_jwt_auth.exceptions import AuthJWTException
 
-from api.v1 import users, roles
+from api.v1 import users, roles, admin
 from api.v1.user_auth import get_current_user_global
 
 from core.config import settings
@@ -45,13 +45,14 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
 
 app.include_router(users.router, prefix='/api/v1/users', tags=['users'], dependencies=[Depends(get_current_user_global)])
 app.include_router(roles.router, prefix='/api/v1/roles', tags=['roles'], dependencies=[Depends(get_current_user_global)])
+app.include_router(admin.router, prefix='/api/v1/admin', tags=['admin'], dependencies=[Depends(get_current_user_global)])
 
 
 if __name__ == '__main__':
     uvicorn.run(
         'main:app',
         host='0.0.0.0',
-        port=8000,
+        port=8001,
         log_config=LOGGING,
         log_level=logging.DEBUG,
         reload=True,
