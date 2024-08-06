@@ -1,38 +1,56 @@
 services:
-    db:
-      container_name: "db"
+    auth_db:
       image: postgres:${POSTGRES_VERSION}
-      env_file:
-        - ./services/auth/env/prod/.env
+      restart: always
+      container_name: "auth_db"
       volumes:
-        - ./services/auth/src/data/db/data:/var/lib/postgresql/data
+        - ./auth/src/data/db/data:/var/lib/postgresql/data
+      env_file:
+        - .env
       healthcheck:
-          test: ["CMD", "psql", "-h", "localhost", "-U", "app", "-d", "movies_database"]
-          interval: 2s
-          retries: 100
+        test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+        interval: ${INTERVAL_CHECK}
+        timeout: ${TIMEOUT_CHECK}
+        retries: ${RETRIES_CHECK}
+      networks:
+        - auth_service_network
 
-    redis:
-      container_name: "redis"
+    auth_redis:
+      container_name: "auth_redis"
       image: redis:${REDIS_VERSION}
       restart: always
+      env_file:
+        - .env
+      networks:
+        - auth_service_network
 
     auth:
       container_name: "auth"
-      build: ./services/auth/src
+      build: ./auth/src
       env_file:
-        - ./services/auth/env/prod/.env
+        - ./auth/env/prod/.env
       depends_on:
-        db:
+        auth_db:
           condition: service_healthy
+      expose:
+        - 8001
+      networks:
+        - auth_service_network
 
-    nginx:
-      container_name: "nginx"
+    auth_nginx:
+      container_name: "auth_nginx"
       restart: always
-      build: ./services/nginx
+      build: ./nginx
       volumes:
-        - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-        - ./services/nginx/configs:/etc/nginx/conf.d:ro
+        - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        - ./nginx/configs:/etc/nginx/conf.d:ro
       depends_on:
         - auth
       ports:
-        - "80:80"
+        - ${NGINX_PORTS}
+      networks:
+        - auth_service_network
+
+networks:
+  auth_service_network:
+    driver: bridge
