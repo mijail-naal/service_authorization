@@ -17,6 +17,7 @@ from schemas.user import (
     UserInDB, 
     UserCreate,
     UsernameLogin,
+    UserEmailLogin,
     UserAccess, 
     JTWSettings, 
     ChangeUsername, 
@@ -47,6 +48,11 @@ class UserService:
  
     async def user_validation(self, credentials: UsernameLogin, db: AsyncSession) -> User | None:
         query = await db.execute(select(User).where(User.login == credentials.username))
+        user = query.scalars().first()
+        return user
+    
+    async def user_email_validation(self, credentials: UserEmailLogin, db: AsyncSession) -> User | None:
+        query = await db.execute(select(User).where(User.email == credentials.email))
         user = query.scalars().first()
         return user
     
