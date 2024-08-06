@@ -19,7 +19,7 @@ session_maker = sessionmaker(
 session = session_maker()
 
 
-def create_superuser():
+def create_roles():
     roles = ['user', 'admin', 'superuser']
     for role in roles:
         obj = Role(role=role)
@@ -29,4 +29,4 @@ def create_superuser():
 
 
 if __name__== '__main__':
-    typer.run(create_superuser)
+    typer.run(create_roles)

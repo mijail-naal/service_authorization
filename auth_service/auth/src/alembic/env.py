@@ -5,7 +5,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from models import Base
+#from models.entity import Base
+from db.postgres import Base
 
 from core.config import pg
 
@@ -65,14 +66,13 @@ def run_migrations_online() -> None:
         "DB_USER": pg.user,
         "DB_PASS": pg.password,
         "DB_HOST": pg.host,
+        "DB_PORT": str(pg.port),
         "DB_NAME": pg.db
     }
 
     url = config.get_main_option("sqlalchemy.url")
 
     url = re.sub(r"\${(.+?)}", lambda m: url_tokens[m.group(1)], url)
-
-    print(url)
 
     connectable = create_engine(url)
 

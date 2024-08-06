@@ -23,7 +23,7 @@ def create_superuser(login: str, password: str):
     superuser = User(
         login=login,
         password=password,
-        email='admind@sample.com',
+        email='admin@sample.com',
         first_name='',
         last_name='',
     )

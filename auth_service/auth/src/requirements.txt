@@ -1,5 +1,5 @@
-aiohttp==3.9.5
-aiosqlite==0.20.0
+# aiohttp==3.9.5
+# aiosqlite==0.20.0
 alembic==1.13.2
 async-fastapi-jwt-auth==0.6.5
 asyncpg==0.29.0
