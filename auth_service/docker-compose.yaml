@@ -1,0 +1,38 @@
+services:
+    db:
+      container_name: "db"
+      image: postgres:${POSTGRES_VERSION}
+      env_file:
+        - ./services/auth/env/prod/.env
+      volumes:
+        - ./services/auth/src/data/db/data:/var/lib/postgresql/data
+      healthcheck:
+          test: ["CMD", "psql", "-h", "localhost", "-U", "app", "-d", "movies_database"]
+          interval: 2s
+          retries: 100
+
+    redis:
+      container_name: "redis"
+      image: redis:${REDIS_VERSION}
+      restart: always
+
+    auth:
+      container_name: "auth"
+      build: ./services/auth/src
+      env_file:
+        - ./services/auth/env/prod/.env
+      depends_on:
+        db:
+          condition: service_healthy
+
+    nginx:
+      container_name: "nginx"
+      restart: always
+      build: ./services/nginx
+      volumes:
+        - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        - ./services/nginx/configs:/etc/nginx/conf.d:ro
+      depends_on:
+        - auth
+      ports:
+        - "80:80"
