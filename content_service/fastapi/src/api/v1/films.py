@@ -9,6 +9,9 @@ from utils.enums import Sort
 from models.film import Film, FilmRating
 from models.abstract import PaginatedParams
 
+from services.authorization import security_jwt
+from typing import Annotated
+
 
 router = APIRouter()
 
@@ -27,7 +30,10 @@ router = APIRouter()
                         writers,
                         directors
                     ''')
-async def film_details(film_id: str, film_service: FilmService = Depends(get_film_service)) -> Film:
+async def film_details(
+        user: Annotated[dict, Depends(security_jwt)],
+        film_id: str, 
+        film_service: FilmService = Depends(get_film_service)) -> Film:
     film = await film_service.get_by_id(film_id)
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
@@ -71,6 +77,7 @@ async def films_list(
             summary='Получить список фильмов отсортировано по рейтингу или по рейтингу и по жанру',
             description='Формат массива данных ответа: uuid, title, imdb_rating')
 async def films_rating(
+        # user: Annotated[dict, Depends(security_jwt)],
         genre: str = Query(
             default=None,
             alias=config.GENRE_ALIAS,

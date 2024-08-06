@@ -21,7 +21,8 @@ class Settings(BaseSettings):
     elastic_protocol: str = Field('http', alias='ELASTIC_PROTOCOL')
     elastic_host: str = Field('127.0.0.1', alias='ELASTIC_HOST')
     elastic_port: int = Field(9200, alias='ELASTIC_PORT')
-
+    auth_password: str = ...
+    auth_algorithm: str = ...
 
 settings = Settings()
 
