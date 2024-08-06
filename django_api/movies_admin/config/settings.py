@@ -23,6 +23,7 @@ CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(',')
 
 include(
     'components/app_definition.py',
+    'components/authorization.py',
     'components/database.py',
     'components/validation.py',
     'components/internationalization.py',
