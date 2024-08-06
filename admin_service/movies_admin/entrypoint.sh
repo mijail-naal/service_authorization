@@ -6,18 +6,9 @@ python manage.py compilemessages -l ru -l en
 
 python manage.py collectstatic --noinput
 
-if [ "$DJANGO_SUPERUSER_USERNAME" ]
-then
-    python manage.py createsuperuser \
-        --noinput \
-        --username $DJANGO_SUPERUSER_USERNAME \
-        --email $DJANGO_SUPERUSER_EMAIL
-fi
-$@
+# sudo chmod +x ./load_data.py
 
-#sudo chmod +x ./load_data.py
-
-python load_data.py
+# python load_data.py
 
 set -e
 

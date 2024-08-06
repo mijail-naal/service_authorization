@@ -33,9 +33,9 @@ RUN  mkdir -p /var/www/static/ \
      && chown -R $USERNAME:$USERNAME /opt/app /opt/app/static /var/www/static \
      /var/www/media /opt/app/media
 
-COPY . .
 COPY requirements.txt requirements.txt
 RUN  pip install -r requirements.txt
+COPY . .
 
 EXPOSE 8000
 
