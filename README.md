@@ -1,3 +1,48 @@
+# Проектная работа 7 спринта
+
+
+
+### Развертывание
+*Auth_sprint_2/docker-compose.yml*
+
+```bash
+  docker compose up --build -d
+```
+
+
+### Migrations
+*Only if debug=False in auth_service/auth/env/prod/.env*
+
+```bash
+  docker exec -it auth sh -c "alembic upgrade head"
+```
+
+### Создание Роли
+
+```bash
+  docker exec -it auth sh -c "python create_roles.py"
+```
+
+### Создание суперпользователя
+
+```bash
+  docker exec -it auth sh -c "python create_superuser.py <login> <password>"
+```
+
+<br><br>
+
+
+> admin service: http://localhost:8000/admin/  
+> default email: admin@sample.com
+>
+> auth service: http://localhost:8001/api/openapi
+>
+> content service: http://localhost/api/openapi
+
+----- 
+
+<br><br>
+
 # Проектная работа спринта
 
 1. Создайте интеграцию Auth-сервиса с сервисом выдачи контента и административной панелью, используя контракт, который вы сделали в прошлом задании.

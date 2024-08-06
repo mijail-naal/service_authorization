@@ -1,0 +1,56 @@
+services:
+    auth_db:
+      image: postgres:${POSTGRES_VERSION}
+      restart: always
+      container_name: "auth_db"
+      volumes:
+        - ./auth/src/data/db/data:/var/lib/postgresql/data
+      env_file:
+        - .env
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+        interval: ${INTERVAL_CHECK}
+        timeout: ${TIMEOUT_CHECK}
+        retries: ${RETRIES_CHECK}
+      networks:
+        - auth_service_network
+
+    auth_redis:
+      container_name: "auth_redis"
+      image: redis:${REDIS_VERSION}
+      restart: always
+      env_file:
+        - .env
+      networks:
+        - auth_service_network
+
+    auth:
+      container_name: "auth"
+      build: ./auth/src
+      env_file:
+        - ./auth/env/prod/.env
+      depends_on:
+        auth_db:
+          condition: service_healthy
+      expose:
+        - 8001
+      networks:
+        - auth_service_network
+
+    auth_nginx:
+      container_name: "auth_nginx"
+      restart: always
+      build: ./nginx
+      volumes:
+        - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        - ./nginx/configs:/etc/nginx/conf.d:ro
+      depends_on:
+        - auth
+      ports:
+        - ${NGINX_PORTS}
+      networks:
+        - auth_service_network
+
+networks:
+  auth_service_network:
+    driver: bridge

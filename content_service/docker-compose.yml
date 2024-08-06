@@ -1,0 +1,107 @@
+services:
+
+  content_nginx:
+    container_name: "content_nginx"
+    restart: always
+    build: ./nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/configs:/etc/nginx/conf.d:ro
+    depends_on:
+      - content_fastapi
+    ports:
+      - ${NGINX_PORTS}
+    networks:
+      - content_service_network
+
+  content_redis:
+    container_name: "content_redis"
+    image: redis:${REDIS_VERSION}
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 50M
+    ports:
+      - ${REDIS_PORTS}
+    volumes:
+      - ./redis/data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 50
+    networks:
+      - content_service_network
+
+  content_fastapi:
+    container_name: "content_fastapi"
+    build: ./fastapi
+    env_file:
+      - ./fastapi/env/prod/.env
+    command: ["/app/src/docker/app.sh"]
+    expose:
+      - 3000
+    ports:
+      - 3000
+    depends_on:
+      - content_elasticsearch
+      - content_redis
+    networks:
+      - content_service_network
+
+  content_elasticsearch:
+    container_name: "content_elasticsearch"
+    image: elasticsearch:${ELASTIC_VERSION}
+    ports:
+      - ${ELASTIC_PORTS}
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      # - "ES_JAVA_OPTS=-Xms200m -Xmx200m"
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://${ELASTIC_HOST}:${ELASTIC_PORT}/_cat/health?h=status | grep -q green"]
+      retries: 300
+      interval: 10s
+    networks:
+      - content_service_network
+
+  # kibana:
+  #   container_name: "kibana"
+  #   image: kibana:8.12.1
+  #   ports:
+  #     - 5601:5601
+  #   depends_on: [ "elasticsearch" ]
+  #   volumes:
+  #     - "./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:5601"]
+  #     retries: 300
+  #     interval: 2s
+    
+  etl_loader:
+    container_name: "etl_loader"
+    build: ./etl_loader
+    depends_on: 
+      content_elasticsearch:
+        condition: service_healthy
+    env_file:
+      - ./etl_loader/env/prod/.env
+    environment:
+      - ELASTIC_PROTOCOL=http
+      - ELASTIC_HOST=${ELASTIC_HOST}
+      - ELASTIC_PORT=${ELASTIC_PORT}
+    networks:
+      - content_service_network
+
+
+volumes:
+  elastic_data:
+
+networks:
+  content_service_network:
+    driver: bridge
