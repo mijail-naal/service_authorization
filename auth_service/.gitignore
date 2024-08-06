@@ -141,4 +141,4 @@ GitHub.sublime-settings
 *.DS_Store
 
 # DB's generated data
-services/auth/src/data/db/data
+auth/src/data/db/data
