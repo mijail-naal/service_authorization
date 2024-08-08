@@ -43,9 +43,9 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
 
 
-app.include_router(users.router, prefix='/api/v1/users', tags=['users'], dependencies=[Depends(get_current_user_global)])
+app.include_router(users.router, prefix='/api/v1/users', tags=['users'])
 app.include_router(roles.router, prefix='/api/v1/roles', tags=['roles'], dependencies=[Depends(get_current_user_global)])
-app.include_router(admin.router, prefix='/api/v1/admin', tags=['admin'], dependencies=[Depends(get_current_user_global)])
+app.include_router(admin.router, prefix='/api/v1/admin', tags=['admin'])
 
 
 if __name__ == '__main__':

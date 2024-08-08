@@ -13,16 +13,18 @@ from services.user import UserService, get_user_service
 from schemas.user import (
     UserInDB, 
     UserCreate, 
-    UsernameLogin, 
-    JTWSettings, 
+    UsernameLogin,
     UserAccess, 
     ChangeUsername, 
     ChangePassword, 
     UserHistoryInDB,
-    UserRoles
+    UserRoles,
+    UserInDBRole
 )
+from schemas.jwt_settings import JTWSettings
+from schemas.auth_request import AuthRequest
 from models.abstract import PaginatedParams
-from .user_auth import roles_required, UserInDBRole, AuthRequest
+from .user_auth import roles_required, get_current_user_global
 
 
 router = APIRouter()
@@ -39,7 +41,7 @@ def get_config():
 async def check_if_token_in_denylist(decrypted_token):
     jti = decrypted_token["jti"]
     entry = await redis.get(jti)
-    return entry and entry == True
+    return entry and entry == "true"
 
 
 @router.post('/signup', response_model=UserInDB, status_code=HTTPStatus.CREATED)
@@ -74,13 +76,14 @@ async def login(
     return tokens
 
 
-@router.post('/signout', status_code=HTTPStatus.OK)
+@router.delete('/signout', status_code=HTTPStatus.OK)
 async def logout(
     user_service: UserService = Depends(get_user_service),
     authorize: AuthJWT = Depends(auth_dep)
 ) -> dict:
     await authorize.jwt_required()
-    #await user_service.revoke_tokens(tokens, authorize, jtw_settings)
+    await user_service.access_revoke(authorize, jtw_settings)
+    await user_service.refresh_revoke(authorize, jtw_settings)
     await authorize.unset_jwt_cookies()
     return {"detail": "Logged out successfully"}
 
@@ -153,6 +156,7 @@ async def login_history(
 async def get_users(
     *,
     request: AuthRequest,
+    permission: AuthJWTBearer = Depends(get_current_user_global),
     user_service: UserService = Depends(get_user_service),
     db: AsyncSession = Depends(get_session),
     authorize: AuthJWT = Depends(auth_dep)
