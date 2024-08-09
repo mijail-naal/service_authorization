@@ -15,7 +15,8 @@ from schemas.role import (
     AsignRole,
     RoleDelete
 )
-from .user_auth import roles_required, AuthRequest, UserInDBRole
+from schemas.auth_request import AuthRequest
+from .user_auth import roles_required
 
 
 router = APIRouter()

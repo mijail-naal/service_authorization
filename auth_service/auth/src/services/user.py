@@ -19,11 +19,11 @@ from schemas.user import (
     UsernameLogin,
     UserEmailLogin,
     UserAccess, 
-    JTWSettings, 
     ChangeUsername, 
     ChangePassword, 
     LoginHistory
 )
+from schemas.jwt_settings import JTWSettings
 
 
 class UserService:
@@ -60,11 +60,15 @@ class UserService:
         access_token = await authorize.create_access_token(subject=credentials.username)
         refresh_token = await authorize.create_refresh_token(subject=credentials.username)
         return UserAccess(access_token=access_token, refresh_token=refresh_token)
+   
+    async def access_revoke(self, authorize: AuthJWT, jtw_settings: JTWSettings):
+        await authorize.jwt_required()
+        access_jti = (await authorize.get_raw_jwt())['jti']
+        await self.cache.setex(access_jti, jtw_settings.access_expires, "true")
     
-    async def revoke_tokens(self, tokens: UserAccess, authorize: AuthJWT, jtw_settings: JTWSettings):
-        access_jti = (await authorize.get_raw_jwt(encoded_token=tokens.access_token))['jti']
-        refresh_jti = (await authorize.get_raw_jwt(encoded_token=tokens.refresh_token))['jti']
-        await self.cache.setex(access_jti, jtw_settings.refresh_expires, "true")
+    async def refresh_revoke(self, authorize: AuthJWT, jtw_settings: JTWSettings):
+        await authorize.jwt_refresh_token_required()
+        refresh_jti = (await authorize.get_raw_jwt())['jti']
         await self.cache.setex(refresh_jti, jtw_settings.refresh_expires, "true")
 
     async def refresh_token(self, tokens: UserAccess, authorize: AuthJWT) -> dict:
