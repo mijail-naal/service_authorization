@@ -1,17 +1,22 @@
 # Проектная работа 7 спринта
 
+### [Auth_sprint_2](https://github.com/mijail-naal/Auth_sprint_2)
 
+
+[Приглашение](https://github.com/mijail-naal/Auth_sprint_2/invitations)
+
+<br>
 
 ### Развертывание
-*Auth_sprint_2/docker-compose.yml*
+#####  *Auth_sprint_2/docker-compose.yml*
 
 ```bash
   docker compose up --build -d
 ```
 
 
-### Migrations
-*Only if debug=False in auth_service/auth/env/prod/.env*
+### Миграции
+##### *Only if debug=False in auth_service/auth/env/prod/.env*
 
 ```bash
   docker exec -it auth sh -c "alembic upgrade head"
