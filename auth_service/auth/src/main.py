@@ -10,8 +10,9 @@ from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from redis.asyncio import Redis
 from async_fastapi_jwt_auth import AuthJWT
 from async_fastapi_jwt_auth.exceptions import AuthJWTException
+from starlette.middleware.sessions import SessionMiddleware
 
-from api.v1 import users, roles, admin
+from api.v1 import users, roles, admin, oauth
 from api.v1.user_auth import get_current_user_global
 from core.config import settings
 from core.logger import LOGGING
@@ -46,8 +47,13 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
 app.include_router(users.router, prefix='/api/v1/users', tags=['users'])
 app.include_router(roles.router, prefix='/api/v1/roles', tags=['roles'], dependencies=[Depends(get_current_user_global)])
 app.include_router(admin.router, prefix='/api/v1/admin', tags=['admin'])
+app.include_router(oauth.router, prefix='/api/v1/oauth', tags=['oauth'])
 
 
+# OAuth
+app.add_middleware(SessionMiddleware, secret_key=settings.secret_key)
+
+# Tracer
 @app.middleware('http')
 async def before_request(request: Request, call_next):
     response = await call_next(request)

@@ -29,3 +29,4 @@ opentelemetry-sdk==1.26.0
 opentelemetry-instrumentation-fastapi==0.47b0
 opentelemetry-exporter-jaeger==1.21.0
 fastapi-limiter==0.1.6
+itsdangerous==2.2.0
