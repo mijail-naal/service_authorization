@@ -9,7 +9,7 @@ services:
     env_file: 
       - .env
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
       interval: ${INTERVAL_CHECK}
       timeout: ${TIMEOUT_CHECK}
       retries: ${RETRIES_CHECK}
