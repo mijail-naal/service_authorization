@@ -4,8 +4,10 @@ import uvicorn
 from contextlib import asynccontextmanager
 
 from elasticsearch import AsyncElasticsearch
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.responses import ORJSONResponse
+from fastapi_limiter import FastAPILimiter
+from fastapi_limiter.depends import RateLimiter
 from redis.asyncio import Redis
 
 from api.v1 import films, genres, persons
@@ -24,9 +26,11 @@ async def lifespan(app: FastAPI):
             f'{settings.elastic_protocol}://{settings.elastic_host}:{settings.elastic_port}'
         ]
     )
+    await FastAPILimiter.init(redis.redis)
     yield
     await redis.redis.close()
     await elastic.es.close()
+    await FastAPILimiter.close()
 
 app = FastAPI(
     title=settings.project_name,
@@ -36,9 +40,9 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-app.include_router(films.router, prefix='/api/v1/films', tags=['films'])
-app.include_router(genres.router, prefix='/api/v1/genres', tags=['genres'])
-app.include_router(persons.router, prefix='/api/v1/persons', tags=['persons'])
+app.include_router(films.router, prefix='/api/v1/films', tags=['films'], dependencies=[Depends(RateLimiter(times=2, seconds=5))])
+app.include_router(genres.router, prefix='/api/v1/genres', tags=['genres'], dependencies=[Depends(RateLimiter(times=2, seconds=5))])
+app.include_router(persons.router, prefix='/api/v1/persons', tags=['persons'], dependencies=[Depends(RateLimiter(times=2, seconds=5))])
 
 if __name__ == '__main__':
     uvicorn.run(
