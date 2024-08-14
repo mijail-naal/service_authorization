@@ -6,6 +6,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, status, Depends
 from fastapi.responses import JSONResponse
 from fastapi.responses import ORJSONResponse
+from fastapi_limiter import FastAPILimiter
+from fastapi_limiter.depends import RateLimiter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from redis.asyncio import Redis
 from async_fastapi_jwt_auth import AuthJWT
@@ -26,8 +28,10 @@ async def lifespan(app: FastAPI):
     if settings.debug:
         from db.postgres import create_database
         await create_database()
+    await FastAPILimiter.init(redis.redis)
     yield
     await redis.redis.close()
+    await FastAPILimiter.close()
 
 
 app = FastAPI(
@@ -46,8 +50,8 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
 
 app.include_router(users.router, prefix='/api/v1/users', tags=['users'])
 app.include_router(roles.router, prefix='/api/v1/roles', tags=['roles'], dependencies=[Depends(get_current_user_global)])
-app.include_router(admin.router, prefix='/api/v1/admin', tags=['admin'])
-app.include_router(oauth.router, prefix='/api/v1/oauth', tags=['oauth'])
+app.include_router(admin.router, prefix='/api/v1/admin', tags=['admin'], dependencies=[Depends(RateLimiter(times=2, seconds=5))])
+app.include_router(oauth.router, prefix='/api/v1/oauth', tags=['oauth'], dependencies=[Depends(RateLimiter(times=2, seconds=5))])
 
 
 # OAuth
