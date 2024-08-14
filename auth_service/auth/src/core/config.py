@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     service_name: str = ...
     jaeger_host: str = ...
     jaeger_port: int = ...
+    secret_key: str = ...
 
 
 settings = Settings()
@@ -45,6 +46,20 @@ class PostgresSettings(BaseSettings):
 
 
 pg = PostgresSettings()
+
+
+class GoogleSettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix='google_',
+        env_file='../env/prod/.env',
+        env_file_encoding='utf-8',
+        extra='ignore'
+    )
+    client_id: str = ...
+    client_secret: str = ...
+
+
+gs = GoogleSettings()
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

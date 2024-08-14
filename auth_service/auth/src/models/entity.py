@@ -18,6 +18,7 @@ class User(Base):
     password = Column(String(255), nullable=False)
     first_name = Column(String(50))
     last_name = Column(String(50))
+    provider = Column(String(255), nullable=False, default="auth_service")
     created_at = Column(DateTime, default=datetime.utcnow())  # .utcnow   tz=timezone.utc  now()
 
     role_id = Column(ForeignKey('roles.id'), default=1)
