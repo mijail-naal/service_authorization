@@ -48,9 +48,21 @@ def upgrade() -> None:
     sa.Column('user_id', sa.UUID(), nullable=False),
     sa.Column('logged_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('id')
+    sa.PrimaryKeyConstraint('id', 'logged_at'),
+    sa.UniqueConstraint('id', 'logged_at'),
+
+    postgresql_partition_by='RANGE (logged_at)'
     )
+
+    op.execute("""CREATE TABLE login_history01_04 PARTITION OF login_history 
+               FOR VALUES FROM ('2024-01-01') TO ('2024-05-01');""")
+    
+    op.execute("""CREATE TABLE login_history05_08 PARTITION OF login_history 
+               FOR VALUES FROM ('2024-05-01') TO ('2024-09-01');""")
+    
+    op.execute("""CREATE TABLE login_history09_12 PARTITION OF login_history 
+               FOR VALUES FROM ('2024-09-01') TO ('2025-01-01');""")
+
     # ### end Alembic commands ###
 
 

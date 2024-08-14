@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, DateTime, String, Integer, ForeignKey
+from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -41,6 +41,12 @@ class User(Base):
 
 class UserHistory(Base):
     __tablename__ = 'login_history'
+    __table_args__ = (
+        UniqueConstraint('id', 'logged_at'),
+        {
+            "postgresql_partition_by": "RANGE (logged_at)",
+        },
+    )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     user_id = Column(ForeignKey('users.id', ondelete="CASCADE"), default=uuid.uuid4, unique=False, nullable=False)
