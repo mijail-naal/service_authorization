@@ -64,7 +64,7 @@ services:
     volumes:
       - elastic_data:/usr/share/elasticsearch/data
     healthcheck:
-      test: ["CMD-SHELL", "curl -s http://${ELASTIC_HOST}:${ELASTIC_PORT}/_cat/health?h=status | grep -q green"]
+      test: ["CMD-SHELL", "curl -s http://${ELASTIC_HOST}:${ELASTIC_PORT}/_cat/health?h=status | grep -q yellow"]
       retries: 300
       interval: 10s
     networks:
