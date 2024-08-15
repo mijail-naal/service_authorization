@@ -14,13 +14,13 @@ from werkzeug.security import generate_password_hash
 from db.redis import get_redis
 from models.entity import User, UserHistory
 from schemas.user import (
-    UserInDB, 
+    UserInDB,
     UserCreate,
     UsernameLogin,
     UserEmailLogin,
-    UserAccess, 
-    ChangeUsername, 
-    ChangePassword, 
+    UserAccess,
+    ChangeUsername,
+    ChangePassword,
     LoginHistory
 )
 from schemas.jwt_settings import JTWSettings
@@ -45,27 +45,27 @@ class UserService:
         user = User(**user_dto)
         new_user = await self._add_to_db(user, db)
         return new_user
- 
+
     async def user_validation(self, credentials: UsernameLogin, db: AsyncSession) -> User | None:
         query = await db.execute(select(User).where(User.login == credentials.username))
         user = query.scalars().first()
         return user
-    
+
     async def user_email_validation(self, credentials: UserEmailLogin, db: AsyncSession) -> User | None:
         query = await db.execute(select(User).where(User.email == credentials.email))
         user = query.scalars().first()
         return user
-    
+
     async def create_user_tokens(self, credentials: UsernameLogin, authorize: AuthJWT) -> UserAccess:
         access_token = await authorize.create_access_token(subject=credentials.username)
         refresh_token = await authorize.create_refresh_token(subject=credentials.username)
         return UserAccess(access_token=access_token, refresh_token=refresh_token)
-   
+
     async def access_revoke(self, authorize: AuthJWT, jtw_settings: JTWSettings):
         await authorize.jwt_required()
         access_jti = (await authorize.get_raw_jwt())['jti']
         await self.cache.setex(access_jti, jtw_settings.access_expires, "true")
-    
+
     async def refresh_revoke(self, authorize: AuthJWT, jtw_settings: JTWSettings):
         await authorize.jwt_refresh_token_required()
         refresh_jti = (await authorize.get_raw_jwt())['jti']
@@ -80,12 +80,12 @@ class UserService:
         current_user = (await authorize.get_raw_jwt())['sub']
         db_user = await db.execute(select(User).where(User.login == current_user))
         return db_user.scalars().first()
-    
+
     async def change_login(self, login: ChangeUsername, user: User, db: AsyncSession) -> User:
         user.login = login.new_username
         user = await self._add_to_db(user, db)
         return user
-    
+
     async def change_password(self, login: ChangePassword, user: User, db: AsyncSession):
         user.password = generate_password_hash(login.new_password)
         user = await self._add_to_db(user, db)
@@ -97,22 +97,22 @@ class UserService:
         user = UserHistory(**user_dto)
         user_history = await self._add_to_db(user, db)
         return user_history
-    
+
     async def get_login_history(self, user: User, page: int, size: int, db: AsyncSession):
         page = page - 1
         db_user = await db.execute(
-            select(UserHistory).where(UserHistory.user_id == user.id).\
-                order_by(UserHistory.logged_at).limit(size).offset(page*size)
+            select(UserHistory).where(UserHistory.user_id == user.id).
+            order_by(UserHistory.logged_at).limit(size).offset(page*size)
         )
         return db_user.scalars().all()
-    
+
     async def get_all_users(self, db: AsyncSession) -> list[UserInDB]:
         query = await db.execute(select(User))
         users = query.scalars().all()
         return users
 
 
-lru_cache()
+@lru_cache()
 def get_user_service(
         cache: Redis = Depends(get_redis)
 ) -> UserService:

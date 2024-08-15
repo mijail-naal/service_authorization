@@ -44,7 +44,7 @@ class UsernameLogin(BaseModel):
 
 class LoginHistory(BaseModel):
     user_id: UUID
-    #logged_at: datetime
+    # logged_at: datetime
 
 
 class UserHistoryInDB(BaseModel):

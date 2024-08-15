@@ -1,4 +1,3 @@
-import json
 from http import HTTPStatus
 from fastapi import APIRouter, Request, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,7 +5,6 @@ from async_fastapi_jwt_auth import AuthJWT
 from async_fastapi_jwt_auth.auth_jwt import AuthJWTBearer
 
 from starlette.config import Config
-from starlette.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuth
 from authlib.integrations.base_client.errors import OAuthError
 from authlib.oauth2.rfc6749 import OAuth2Token
@@ -43,7 +41,7 @@ async def login(request: Request, provider: OAuthProvider):
             status_code=HTTPStatus.FORBIDDEN,
             detail=f'{provider.value} provider not implemented yet.'
         )
-    redirect_uri = request.url_for(f'callback_login', provider=provider.value)
+    redirect_uri = request.url_for('callback_login', provider=provider.value)
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 

@@ -4,8 +4,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.postgres import get_session
 
-from models.user import User
-
 from services.user import UserService, get_user_service
 
 

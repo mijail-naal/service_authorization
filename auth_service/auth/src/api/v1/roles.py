@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from async_fastapi_jwt_auth import AuthJWT
 from async_fastapi_jwt_auth.auth_jwt import AuthJWTBearer
@@ -8,9 +8,9 @@ from async_fastapi_jwt_auth.auth_jwt import AuthJWTBearer
 from db.postgres import get_session
 from services.user import UserService, get_user_service
 from services.role import RoleService, get_role_service
-from schemas.user import UserAccess, UserRoles
+from schemas.user import UserRoles
 from schemas.role import (
-    RoleInDB, 
+    RoleInDB,
     RoleCreate,
     AsignRole,
     RoleDelete
@@ -27,7 +27,7 @@ auth_dep = AuthJWTBearer()
 @roles_required(roles_list=[UserRoles().admin, UserRoles().superuser])
 async def get_roles(
     request: AuthRequest,
-    role_service: RoleService = Depends(get_role_service), 
+    role_service: RoleService = Depends(get_role_service),
     db: AsyncSession = Depends(get_session),
     authorize: AuthJWT = Depends(auth_dep)
 ) -> RoleInDB:
@@ -41,11 +41,11 @@ async def get_roles(
 async def create_role(
     request: AuthRequest,
     role_create: RoleCreate,
-    role_service: RoleService = Depends(get_role_service), 
+    role_service: RoleService = Depends(get_role_service),
     db: AsyncSession = Depends(get_session),
     authorize: AuthJWT = Depends(auth_dep)
 ) -> RoleInDB:
-    #await authorize.jwt_required()
+    # await authorize.jwt_required()
 
     return await role_service.create_role(role_create, db)
 
@@ -56,7 +56,7 @@ async def asign_role(
     request: AuthRequest,
     data: AsignRole,
     role_service: RoleService = Depends(get_role_service),
-    user_service: UserService = Depends(get_user_service), 
+    user_service: UserService = Depends(get_user_service),
     db: AsyncSession = Depends(get_session),
     authorize: AuthJWT = Depends(auth_dep)
 ) -> dict:
@@ -75,7 +75,7 @@ async def asign_role(
 async def revoke_role(
     request: AuthRequest,
     role_service: RoleService = Depends(get_role_service),
-    user_service: UserService = Depends(get_user_service), 
+    user_service: UserService = Depends(get_user_service),
     db: AsyncSession = Depends(get_session),
     authorize: AuthJWT = Depends(auth_dep)
 ) -> dict:
