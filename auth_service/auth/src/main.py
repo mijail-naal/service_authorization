@@ -67,7 +67,9 @@ async def before_request(request: Request, call_next):
     return  response
 
 
-configure_tracer()
+if settings.enable_tracer:
+    configure_tracer()
+
 FastAPIInstrumentor.instrument_app(app)
 
 
