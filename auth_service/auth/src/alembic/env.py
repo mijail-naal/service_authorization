@@ -1,11 +1,8 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from alembic import context
 
-#from models.entity import Base
+# from models.entity import Base
 from db.postgres import Base
 
 from core.config import pg
@@ -60,7 +57,6 @@ def run_migrations_online() -> None:
 
     from sqlalchemy import create_engine
     import re
-    import os
 
     url_tokens = {
         "DB_USER": pg.user,

@@ -1,22 +1,20 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from async_fastapi_jwt_auth import AuthJWT
-from async_fastapi_jwt_auth.exceptions import AuthJWTException
 from async_fastapi_jwt_auth.auth_jwt import AuthJWTBearer
 
 from db.postgres import get_session
 from db.redis import redis
 from services.user import UserService, get_user_service
 from schemas.user import (
-    UserInDB, 
-    UserCreate, 
+    UserInDB,
+    UserCreate,
     UsernameLogin,
-    UserAccess, 
-    ChangeUsername, 
-    ChangePassword, 
+    UserAccess,
+    ChangeUsername,
+    ChangePassword,
     UserHistoryInDB,
     UserRoles,
     UserInDBRole
@@ -47,7 +45,7 @@ async def check_if_token_in_denylist(decrypted_token):
 @router.post('/signup', response_model=UserInDB, status_code=HTTPStatus.CREATED)
 async def create_user(
     user_create: UserCreate,
-    user_service: UserService = Depends(get_user_service), 
+    user_service: UserService = Depends(get_user_service),
     db: AsyncSession = Depends(get_session),
 ):
     return await user_service.create_user(user_create, db)
@@ -103,7 +101,7 @@ async def refresh(
 @router.patch('/change-username', status_code=HTTPStatus.OK)
 async def change_username(
     login: ChangeUsername,
-    user_service: UserService = Depends(get_user_service), 
+    user_service: UserService = Depends(get_user_service),
     db: AsyncSession = Depends(get_session),
     authorize: AuthJWT = Depends(auth_dep)
 ) -> dict:
@@ -113,7 +111,7 @@ async def change_username(
     await user_service.change_login(login, user, db)
     await authorize.unset_jwt_cookies()
     return {"detail": "Username successfully updated"}
-    
+
 
 @router.patch('/change-password', status_code=HTTPStatus.OK)
 async def change_password(
@@ -125,7 +123,7 @@ async def change_password(
     await authorize.jwt_required()
 
     user = await user_service.get_user(db, authorize)
-    print('password',user)
+    # print('password', user)
     await user_service.change_password(login, user, db)
     await authorize.unset_jwt_cookies()
     return {"detail": "Password successfully updated"}

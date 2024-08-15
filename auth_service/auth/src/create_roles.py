@@ -1,7 +1,5 @@
 import typer
-import psycopg2
 
-from pydantic import BaseModel
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -12,7 +10,7 @@ from core.config import pg, settings
 DATABASE_URL = f'postgresql+psycopg2://{pg.user}:{pg.password}@{pg.host}:{pg.port}/{pg.db}'
 
 
-engine =  create_engine(DATABASE_URL, echo=settings.echo_var, future=True)
+engine = create_engine(DATABASE_URL, echo=settings.echo_var, future=True)
 session_maker = sessionmaker(
     engine, expire_on_commit=False
 )
@@ -25,8 +23,8 @@ def create_roles():
         obj = Role(role=role)
         session.add(obj)
         session.commit()
-    typer.echo(f'Roles created successfully')
+    typer.echo('Roles created successfully')
 
 
-if __name__== '__main__':
+if __name__ == '__main__':
     typer.run(create_roles)

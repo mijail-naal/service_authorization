@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from async_fastapi_jwt_auth import AuthJWT
 from async_fastapi_jwt_auth.auth_jwt import AuthJWTBearer
@@ -8,7 +8,6 @@ from async_fastapi_jwt_auth.auth_jwt import AuthJWTBearer
 from db.postgres import get_session
 from services.user import UserService, get_user_service
 from schemas.user import UserEmailLogin
-from models.entity import User
 
 
 router = APIRouter()
