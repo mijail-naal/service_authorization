@@ -53,7 +53,8 @@ app.include_router(roles.router, prefix='/api/v1/roles', tags=['roles'],
 app.include_router(admin.router, prefix='/api/v1/admin', tags=['admin'],
                    dependencies=[Depends(RateLimiter(times=2, seconds=5))])
 app.include_router(oauth.router, prefix='/api/v1/oauth', tags=['oauth'],
-                   dependencies=[Depends(RateLimiter(times=2, seconds=5))])
+                   dependencies=[Depends(RateLimiter(times=2, seconds=5)),
+                                 Depends(get_current_user_global)])
 
 
 # OAuth
