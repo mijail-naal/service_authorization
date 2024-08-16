@@ -1,7 +1,6 @@
 import orjson
 from functools import lru_cache
 
-from elasticsearch import NotFoundError
 from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
 

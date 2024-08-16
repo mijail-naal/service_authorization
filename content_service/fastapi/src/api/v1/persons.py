@@ -51,7 +51,9 @@ async def persons_list(
 
 
 @router.get('/{person_id}/film', response_model=list[FilmRating])
-async def person_by_films(person_id: str, person_service: PersonService = Depends(get_person_service)) -> list[FilmRating]:
+async def person_by_films(
+        person_id: str, person_service: PersonService = Depends(get_person_service)
+) -> list[FilmRating]:
     person_films = await person_service.get_person_film_rating(person_id)
     if not person_films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
