@@ -8,7 +8,7 @@ def build_body(
     genre_id: str | None = None
 ) -> dict:
     bool_clause = {"must": [{"multi_match": {"query": query}}]} if query else {}
-    sort_clause = {sort_field: {"order": sort_order} } if sort_order and sort_field else {}
+    sort_clause = {sort_field: {"order": sort_order}} if sort_order and sort_field else {}
     if genre_id:
         bool_clause.setdefault("filter", []).append({"nested": {
             "path": "genres",

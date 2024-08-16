@@ -1,4 +1,3 @@
-from fastapi import FastAPI
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 
@@ -27,9 +26,9 @@ def configure_tracer() -> None:
         )
     )
 
-    # Uncomment the next lines to show the trace in console.
-    # trace.get_tracer_provider().add_span_processor(
-    #     BatchSpanProcessor(
-    #         ConsoleSpanExporter()
-    #     )
-    # )
+    if settings.show_tracer:
+        trace.get_tracer_provider().add_span_processor(
+            BatchSpanProcessor(
+                ConsoleSpanExporter()
+            )
+        )

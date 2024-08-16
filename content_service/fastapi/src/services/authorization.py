@@ -13,7 +13,7 @@ def decode_token(token: str) -> dict | None:
         decode_token = jwt.decode(
             token, settings.auth_password, algorithms=settings.auth_algorithm
         )
-        return  decode_token if decode_token['exp'] >= time.time() else None
+        return decode_token if decode_token['exp'] >= time.time() else None
     except Exception:
         return None
 
@@ -40,7 +40,6 @@ class JWTBearer(HTTPBearer):
                                 detail='Invallid or expired token.')
 
         return decode_token
-
 
     @staticmethod
     def parse_token(jwt_token: str) -> dict | None:

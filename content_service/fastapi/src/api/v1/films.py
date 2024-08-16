@@ -32,7 +32,7 @@ router = APIRouter()
                     ''')
 async def film_details(
         user: Annotated[dict, Depends(security_jwt)],
-        film_id: str, 
+        film_id: str,
         film_service: FilmService = Depends(get_film_service)) -> Film:
     film = await film_service.get_by_id(film_id)
     if not film:
@@ -67,8 +67,8 @@ async def films_list(
     )
     if not searchs:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
-    return [FilmRating(uuid=search.uuid, 
-                       title=search.title, 
+    return [FilmRating(uuid=search.uuid,
+                       title=search.title,
                        imdb_rating=search.imdb_rating) for search in searchs]
 
 

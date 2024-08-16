@@ -1,19 +1,13 @@
 from functools import lru_cache
 
-from http import HTTPStatus
-
 import orjson
 
-from elasticsearch import NotFoundError, BadRequestError
-
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
 
 from db.elastic import get_search_service
 from db.redis import get_cache
-
 from models.film import FilmModel, FilmRating
-
 from utils.abstract import AsyncCacheStorage, AsyncSearchService
 
 
@@ -73,7 +67,7 @@ class FilmService:
 
     async def get_films(
             self, genre: str, sort_field: str, sort_order: str,  page: int, size: int
-        ) -> list[FilmRating]:
+    ) -> list[FilmRating]:
         cache_key = 'film:rating:all'
         if genre:
             cache_key = f'film:rating:genre:{genre}'
@@ -92,7 +86,7 @@ class FilmService:
 
     async def _get_films_from_search_service(
             self, genre: str, sort_field: str, sort_order: str,  page: int, size: int
-        ) -> list[FilmRating] | None:
+    ) -> list[FilmRating] | None:
         sort = sort_order.value
         page -= 1
         body = {"from": page, "size": size, "sort": {sort_field: {"order": sort}}}
