@@ -14,9 +14,7 @@
   docker compose up --build -d
 ```
 
-
 ### Миграции
-##### *Only if debug=False in auth_service/auth/env/prod/.env*
 
 ```bash
   docker exec -it auth sh -c "alembic upgrade head"
@@ -26,6 +24,12 @@
 
 ```bash
   docker exec -it auth sh -c "python create_roles.py"
+```
+
+### Создание Провайдеры
+
+```bash
+  docker exec -it auth sh -c "python create_providers.py"
 ```
 
 ### Создание суперпользователя

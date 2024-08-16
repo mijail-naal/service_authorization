@@ -70,7 +70,7 @@ async def login(
     tokens = await user_service.create_user_tokens(credentials, authorize)
     await authorize.set_access_cookies(tokens.access_token)
     await authorize.set_refresh_cookies(tokens.refresh_token)
-    await user_service.add_login_to_history(user, db)
+    await user_service.add_login_to_history(user, 1, db)
     return tokens
 
 
@@ -123,7 +123,6 @@ async def change_password(
     await authorize.jwt_required()
 
     user = await user_service.get_user(db, authorize)
-    # print('password', user)
     await user_service.change_password(login, user, db)
     await authorize.unset_jwt_cookies()
     return {"detail": "Password successfully updated"}

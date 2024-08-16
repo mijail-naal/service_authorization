@@ -61,6 +61,11 @@ class UserService:
         refresh_token = await authorize.create_refresh_token(subject=credentials.username)
         return UserAccess(access_token=access_token, refresh_token=refresh_token)
 
+    async def create_user_tokens_with_email(self, credentials: UserEmailLogin, authorize: AuthJWT) -> UserAccess:
+        access_token = await authorize.create_access_token(subject=credentials.email)
+        refresh_token = await authorize.create_refresh_token(subject=credentials.email)
+        return UserAccess(access_token=access_token, refresh_token=refresh_token)
+
     async def access_revoke(self, authorize: AuthJWT, jtw_settings: JTWSettings):
         await authorize.jwt_required()
         access_jti = (await authorize.get_raw_jwt())['jti']
@@ -91,10 +96,10 @@ class UserService:
         user = await self._add_to_db(user, db)
         return user
 
-    async def add_login_to_history(self, user: User, db: AsyncSession) -> User:
+    async def add_login_to_history(self, user: User, provider_id: int, db: AsyncSession) -> User:
         login_history = LoginHistory(user_id=user.id)
         user_dto = jsonable_encoder(login_history)
-        user = UserHistory(**user_dto)
+        user = UserHistory(**user_dto, provider_id=provider_id)
         user_history = await self._add_to_db(user, db)
         return user_history
 

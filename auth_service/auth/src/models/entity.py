@@ -18,7 +18,6 @@ class User(Base):
     password = Column(String(255), nullable=False)
     first_name = Column(String(50))
     last_name = Column(String(50))
-    provider = Column(String(255), nullable=False, default="auth_service")
     created_at = Column(DateTime, default=datetime.utcnow())  # .utcnow   tz=timezone.utc  now()
 
     role_id = Column(ForeignKey('roles.id'), default=1)
@@ -51,9 +50,11 @@ class UserHistory(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     user_id = Column(ForeignKey('users.id', ondelete="CASCADE"), default=uuid.uuid4, unique=False, nullable=False)
+    provider_id = Column(ForeignKey('providers.id'), default=1, unique=False, nullable=False)
     logged_at = Column(DateTime, default=datetime.utcnow())  # .utcnow   tz=timezone.utc  now()
 
     user = relationship('User', back_populates='history')
+    provider = relationship('Provider', lazy='selectin')
 
 
 class Role(Base):
@@ -65,3 +66,14 @@ class Role(Base):
 
     def __repr__(self) -> str:
         return f'<User {self.role}>'
+
+
+class Provider(Base):
+    __tablename__ = 'providers'
+
+    id = Column(Integer, primary_key=True, autoincrement=True, unique=True, nullable=False)
+    name = Column(String(255), unique=True, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow())
+
+    def __repr__(self) -> str:
+        return f'<User {self.name}>'

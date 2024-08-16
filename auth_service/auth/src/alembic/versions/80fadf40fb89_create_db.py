@@ -30,6 +30,15 @@ def upgrade() -> None:
         sa.UniqueConstraint('role')
     )
     op.create_table(
+        'providers',
+        sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+        sa.Column('name', sa.String(length=255), nullable=False),
+        sa.Column('created_at', sa.DateTime(), nullable=True),
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint('id'),
+        sa.UniqueConstraint('name')
+    )
+    op.create_table(
         'users',
         sa.Column('id', sa.UUID(), nullable=False),
         sa.Column('login', sa.String(length=255), nullable=False),
@@ -49,8 +58,10 @@ def upgrade() -> None:
         'login_history',
         sa.Column('id', sa.UUID(), nullable=False),
         sa.Column('user_id', sa.UUID(), nullable=False),
+        sa.Column('provider_id', sa.Integer(), nullable=False),
         sa.Column('logged_at', sa.DateTime(), nullable=True),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+        sa.ForeignKeyConstraint(['provider_id'], ['providers.id'], ),
         sa.PrimaryKeyConstraint('id', 'logged_at'),
         sa.UniqueConstraint('id', 'logged_at'),
 
@@ -74,4 +85,5 @@ def downgrade() -> None:
     op.drop_table('login_history')
     op.drop_table('users')
     op.drop_table('roles')
+    op.drop_table('providers')
     # ### end Alembic commands ###
