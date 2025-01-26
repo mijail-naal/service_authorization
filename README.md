@@ -1,45 +1,110 @@
-# Проектная работа 7 спринта
+# Service Authorization
 
-### [Auth_sprint_2](https://github.com/mijail-naal/Auth_sprint_2)
+### Auth API description
 
+An asynchronous API for authentication and a role management system implemented whit FastAPI. Also include user registration and authentication in the Auth service by adding login via social services (OAuth).
 
-[Приглашение](https://github.com/mijail-naal/Auth_sprint_2/invitations)
+The API include the next fetures:
+- User registration
+- Login to the account (exchange of login and password for a pair of tokens: JWT-access token and refresh token)
+- Update the access token
+- Logout from account
+- Change username or password
+- Get the user's login history to the account
+- CRUD for role management (only for admin role)
+- Assign or remove a user's role
+- Verify the user's rights.
 
 <br>
 
-### Развертывание
-#####  *Auth_sprint_2/docker-compose.yml*
+### Authorization Service description
+###### Integration with admin panel and content API services
 
-```bash
-  docker compose up --build -d
+A service responsible for creating, storing, and logging a user's profile. It will allow users to register at the online cinema and manage their account, store passwords correctly and ensure the security of user data.
+
+The service architecture considers the system of interaction between services (admin, content and auth services), paying attention to error handling and possible shutdown of one of the services.
+
+<br>
+
+### Three steps to launch the project:
+
+- *Change the files `.env.sample` to `.env` and set the environment variables* 
+
+- *Run `docker-compose.yml`*
+
+- *Execute commads to create db, roles and superuser*
+
+<br>
+
+*All environment variables samples are included in the `.env.sample` files.*
+
+*Don't forget to set the environment variables before running the project!*
+
+
+<br>
+
+### Technologies used:
+
+![Technologies used](https://skillicons.dev/icons?i=python,django,fastapi,nginx,postgres,redis,elasticsearch,docker)
+
+###### Python, Django, Fastapi, Nginx, PostgreSQL, Redis, Elasticsearch, Docker and Jaeger
+
+<br><br>
+
+###### (*) *Do not use this project for a real deployment*.
+
+<br>
+
+# Run the project
+
+### 1. Set the environment variables 
+
+```
+Change all .env.sample files to .env and set the environment variables in the next locations:
+
+- admin_service/.env
+- auth_service/auth/env/prod/.env
+- auth_service/.env
+- content_service/etl_loader/env/prod/.env
+- content_service/fastapi/env/prod/.env
+- content_service/.env
 ```
 
-### Миграции
+### 2. Run docker-compose.yml
+
+```
+$ cd service_authorization/
+
+$ sudo docker compose up --build -d
+```
+
+### 3. Execute the next commands in order
 
 ```bash
+  # 1. Migrations
+
   docker exec -it auth sh -c "alembic upgrade head"
-```
 
-### Создание Роли
 
-```bash
+  # 2. Create roles
+
   docker exec -it auth sh -c "python create_roles.py"
-```
 
-### Создание Провайдеры
 
-```bash
+  # 3. Create providers
+
   docker exec -it auth sh -c "python create_providers.py"
-```
 
-### Создание суперпользователя
 
-```bash
+  # 4. Create superuser
+
   docker exec -it auth sh -c "python create_superuser.py <login> <password>"
 ```
 
 <br><br>
 
+
+#### URLs for local deployment
 
 > admin service: http://localhost:8000/admin/  
 > default email: admin@sample.com
@@ -48,30 +113,95 @@
 >
 > content service: http://localhost/api/openapi
 
------ 
-
 <br><br>
 
-# Проектная работа спринта
+### Project structure
+----
 
-1. Создайте интеграцию Auth-сервиса с сервисом выдачи контента и административной панелью, используя контракт, который вы сделали в прошлом задании.
-  
-    При создании интеграции не забудьте учесть изящную деградацию Auth-сервиса. Auth сервис — один из самых нагруженных, потому что в него ходят большинство сервисов сайта. И если он откажет, сайт отказать не должен. Обязательно учтите этот сценарий в интеграциях с Auth-сервисом.
-2. Добавьте в Auth-сервис трассировку и подключите к Jaeger. Для этого вам нужно добавить работу с заголовком x-request-id и отправку трассировок в Jaeger.
-3. Добавьте в сервис механизм ограничения количества запросов к серверу.
-4. Упростите регистрацию и аутентификацию пользователей в Auth-сервисе, добавив вход через социальные сервисы. Список сервисов выбирайте исходя из целевой аудитории онлайн-кинотеатра — подумайте, какими социальными сервисами они пользуются. Например, использовать [OAuth от Github](https://docs.github.com/en/free-pro-team@latest/developers/apps/authorizing-oauth-apps){target="_blank"} — не самая удачная идея. Ваши пользователи — не разработчики и вряд ли пользуются аккаунтом на Github. Лучше добавить Yandex, VK или Google.
+<br>
 
-    Вам не нужно делать фронтенд в этой задаче и реализовывать собственный сервер OAuth. Нужно реализовать протокол со стороны потребителя.
-    
-    Информация по OAuth у разных поставщиков данных: 
-    
-    - [Yandex](https://yandex.ru/dev/oauth/?turbo=true){target="_blank"},
-    - [VK](https://vk.com/dev/access_token){target="_blank"},
-    - [Google](https://developers.google.com/identity/protocols/oauth2){target="_blank"}.
-5. Партицируйте таблицу с пользователями или с историей входов. Подумайте, по каким критериям вы бы разделили её. Важно посмотреть на таблицу не только в текущем времени, но и заглядывая в некое будущее, когда в ней будут миллионы записей. Пользователи могут быть из одной страны, но из разных регионов. А ещё пользователи могут использовать разные устройства для входа и иметь разные возрастные ограничения.
-    
-## Дополнительное задание
-    
-Реализуйте возможность открепить аккаунт в соцсети от личного кабинета. 
-    
-Решение залейте в репозиторий текущего спринта и отправьте на ревью.
+```
+service_authorization
+├── admin_service
+│   ├── configs
+│   ├── data
+│   ├── movies_admin
+│   │   ├── config
+│   │   ├── movies
+│   │   ├── users
+│   │   ├── uwsgi
+│   │   ├── Dockerfile
+│   │   ├── entrypoint.sh
+│   │   ├── manage.py
+│   │   └── requirements.txt
+│   ├── .env.sample
+│   ├── docker-compose.yml
+│   └── nginx.conf
+├── auth_service
+│   ├── auth
+│   │   ├── env/prod
+│   │   └── src
+│   │       ├── alembic
+│   │       ├── api/v1
+│   │       ├── core
+│   │       ├── db
+│   │       ├── dependencies
+│   │       ├── models
+│   │       ├── schemas
+│   │       ├── services
+│   │       ├── utils
+│   │       ├── alembic.ini
+│   │       ├── create_providers.py
+│   │       ├── create_roles.py
+│   │       ├── create_superuser.py
+│   │       ├── Dockerfile
+│   │       ├── main.py
+│   │       └── requirements.txt
+│   ├── nginx
+│   │   ├── configs
+│   │   │   └── site.conf
+│   │   ├── Dockerfile
+│   │   ├── nginx.conf
+│   │   └── uwsgi_params
+│   ├── .env.sample
+│   └── docker-compose.yml
+├── content_service
+│   ├── es
+│   ├── etl_loader
+│   │   ├── docs
+│   │   ├── env/prod
+│   │   ├── es
+│   │   ├── indices
+│   │   ├── process
+│   │   │   └── elasticloader.py
+│   │   ├── utils
+│   │   │   └── logger.py
+│   │   ├── Dockerfile
+│   │   ├── load_data.py
+│   │   └── requirements.txt
+│   ├── fastapi
+│   │   ├── env/prod
+│   │   ├── src
+│   │   │   ├── api/v1
+│   │   │   ├── core
+│   │   │   ├── db
+│   │   │   ├── docker
+│   │   │   ├── models
+│   │   │   ├── services
+│   │   │   ├── utils
+│   │   │   └── main.py
+│   │   ├── Dockerfile
+│   │   └── requirements.txt
+│   ├── nginx
+│   │   ├── configs
+│   │   │   └── site.conf
+│   │   ├── Dockerfile
+│   │   └── nginx.conf
+│   ├── redis/data
+│   ├── .env.sample
+│   └── docker-compose.yml
+├── docker-compose.yml
+└── README.md
+
+65 directories, 129 files
+```
