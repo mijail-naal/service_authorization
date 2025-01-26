@@ -4,7 +4,7 @@ services:
       restart: always
       container_name: "auth_db"
       volumes:
-        - ./auth/src/data/db/data:/var/lib/postgresql/data
+        - postgres_data_2:/var/lib/postgresql/data
       env_file:
         - .env
       healthcheck:
@@ -50,6 +50,9 @@ services:
         - ${NGINX_PORTS}
       networks:
         - auth_service_network
+
+volumes:
+  postgres_data_2:
 
 networks:
   auth_service_network:

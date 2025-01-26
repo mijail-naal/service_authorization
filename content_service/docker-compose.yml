@@ -60,7 +60,7 @@ services:
       - cluster.name=es-docker-cluster
       - discovery.type=single-node
       - xpack.security.enabled=false
-      # - "ES_JAVA_OPTS=-Xms200m -Xmx200m"
+      - "ES_JAVA_OPTS=-Xms200m -Xmx200m"
     volumes:
       - elastic_data:/usr/share/elasticsearch/data
     healthcheck:
@@ -97,7 +97,6 @@ services:
       - ELASTIC_PORT=${ELASTIC_PORT}
     networks:
       - content_service_network
-
 
 volumes:
   elastic_data:
