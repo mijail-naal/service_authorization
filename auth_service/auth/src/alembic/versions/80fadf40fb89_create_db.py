@@ -69,13 +69,13 @@ def upgrade() -> None:
     )
 
     op.execute("""CREATE TABLE login_history01_04 PARTITION OF login_history
-               FOR VALUES FROM ('2024-01-01') TO ('2024-05-01');""")
+               FOR VALUES FROM ('2025-01-01') TO ('2025-05-01');""")
 
     op.execute("""CREATE TABLE login_history05_08 PARTITION OF login_history
-               FOR VALUES FROM ('2024-05-01') TO ('2024-09-01');""")
+               FOR VALUES FROM ('2025-05-01') TO ('2025-09-01');""")
 
     op.execute("""CREATE TABLE login_history09_12 PARTITION OF login_history
-               FOR VALUES FROM ('2024-09-01') TO ('2025-01-01');""")
+               FOR VALUES FROM ('2025-09-01') TO ('2026-01-01');""")
 
     # ### end Alembic commands ###
 
