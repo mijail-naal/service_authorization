@@ -2,16 +2,16 @@
 
 ### Auth API description
 
-An asynchronous API for authentication and a role management system implemented whit FastAPI. Also include user registration and authentication in the Auth service by adding login via social services (OAuth).
+An asynchronous API for authentication and a role management system implemented with FastAPI. Also includes user registration and authentication in the Auth service by adding a login via social services (OAuth).
 
-The API include the next fetures:
+The API includes the next fetures:
 - User registration
-- Login to the account (exchange of login and password for a pair of tokens: JWT-access token and refresh token)
+- Login to the account (the exchange of login and password for a pair of tokens: JWT-access token and refresh token)
 - Update the access token
-- Logout from account
-- Change username or password
+- Logout from an account
+- Change a username or a password
 - Get the user's login history to the account
-- CRUD for role management (only for admin role)
+- CRUD for role management (only for an admin role)
 - Assign or remove a user's role
 - Verify the user's rights.
 
@@ -32,7 +32,7 @@ The service architecture considers the system of interaction between services (a
 
 - *Run `docker-compose.yml`*
 
-- *Execute commads to create db, roles and superuser*
+- *Execute commads to create db, roles and a superuser*
 
 <br>
 
